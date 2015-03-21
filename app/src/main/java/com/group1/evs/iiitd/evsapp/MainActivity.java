@@ -1,149 +1,117 @@
 package com.group1.evs.iiitd.evsapp;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.util.SparseIntArray;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+import br.liveo.interfaces.NavigationLiveoListener;
+import br.liveo.navigationliveo.NavigationLiveo;
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+public class MainActivity extends NavigationLiveo implements NavigationLiveoListener {
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
+    public List<String> mListNameItem;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+    public void onUserInformation() {
+        //User information here
+        this.mUserName.setText("Rudson Lima");
+        this.mUserEmail.setText("rudsonlive@gmail.com");
+        this.mUserPhoto.setImageResource(R.drawable.ic_rudsonlive);
+        this.mUserBackground.setImageResource(R.drawable.ic_user_background);
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+    public void onInt(Bundle savedInstanceState) {
+        //Creation of the list items is here
+
+        // set listener {required}
+        this.setNavigationListener(this);
+
+        //First item of the position selected from the list
+        this.setDefaultStartPositionNavigation(1);
+
+        // name of the list items
+        mListNameItem = new ArrayList<>();
+        mListNameItem.add(0, getString(R.string.inbox));
+        mListNameItem.add(1, getString(R.string.starred));
+        mListNameItem.add(2, getString(R.string.sent_mail));
+        mListNameItem.add(3, getString(R.string.drafts));
+        mListNameItem.add(4, getString(R.string.more_markers)); //This item will be a subHeader
+        mListNameItem.add(5, getString(R.string.trash));
+        mListNameItem.add(6, getString(R.string.spam));
+
+        // icons list items
+        List<Integer> mListIconItem = new ArrayList<>();
+        mListIconItem.add(0, R.drawable.ic_inbox_black_24dp);
+        mListIconItem.add(1, R.drawable.ic_star_black_24dp); //Item no icon set 0
+        mListIconItem.add(2, R.drawable.ic_send_black_24dp); //Item no icon set 0
+        mListIconItem.add(3, R.drawable.ic_drafts_black_24dp);
+        mListIconItem.add(4, 0); //When the item is a subHeader the value of the icon 0
+        mListIconItem.add(5, R.drawable.ic_delete_black_24dp);
+        mListIconItem.add(6, R.drawable.ic_report_black_24dp);
+
+        //{optional} - Among the names there is some subheader, you must indicate it here
+        List<Integer> mListHeaderItem = new ArrayList<>();
+        mListHeaderItem.add(4);
+
+        //{optional} - Among the names there is any item counter, you must indicate it (position) and the value here
+        SparseIntArray mSparseCounterItem = new SparseIntArray(); //indicate all items that have a counter
+        mSparseCounterItem.put(0, 7);
+        mSparseCounterItem.put(1, 123);
+        mSparseCounterItem.put(6, 250);
+
+        //If not please use the FooterDrawer use the setFooterVisible(boolean visible) method with value false
+        this.setFooterInformationDrawer(R.string.settings, R.drawable.ic_settings_black_24dp);
+
+        this.setNavigationAdapter(mListNameItem, mListIconItem, mListHeaderItem, mSparseCounterItem);
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
+    @Override
+    public void onItemClickNavigation(int position, int layoutContainerId) {
+
+        FragmentManager mFragmentManager = getSupportFragmentManager();
+
+        Fragment mFragment = new FragmentMain().newInstance(mListNameItem.get(position));
+
+        if (mFragment != null) {
+            mFragmentManager.beginTransaction().replace(layoutContainerId, mFragment).commit();
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenuNavigation(Menu menu, int position, boolean visible) {
+
+        //hide the menu when the navigation is opens
+        switch (position) {
+            case 0:
+                menu.findItem(R.id.action_refresh).setVisible(!visible);
+                break;
+
             case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
+                menu.findItem(R.id.action_refresh).setVisible(!visible);
                 break;
         }
-    }
-
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void onClickUserPhotoNavigation(View v) {
+        //user photo onClick
+        Toast.makeText(this, R.string.open_user_profile, Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
+    @Override
+    public void onClickFooterItemNavigation(View v) {
+        //footer onClick
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
 }
