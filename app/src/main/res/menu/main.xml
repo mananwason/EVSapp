@@ -3,9 +3,8 @@
 
     <item
         android:id="@+id/action_refresh"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/ic_sync_white_24dp"
+        app:showAsAction="ifRoom"
         android:title="@string/refresh"/>
 
 </menu>

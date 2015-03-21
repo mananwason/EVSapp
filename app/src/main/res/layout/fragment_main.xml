@@ -8,9 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="121dp"
-        android:contentDescription="@string/clear"
-        android:src="@drawable/ic_liveo" />
+        android:layout_marginTop="121dp" />
 
     <TextView
         android:id="@+id/txtTitle"

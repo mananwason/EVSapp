@@ -55,11 +55,7 @@ public class FragmentMain extends Fragment{
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.main, menu);
 
-        //Select search item
-        final MenuItem menuItem = menu.findItem(R.id.action_refresh);
-        menuItem.setVisible(true);
-
-        mSearchCheck = false;
+        menu.findItem(R.id.action_refresh).setVisible(true);
     }
 
     @Override
@@ -75,18 +71,4 @@ public class FragmentMain extends Fragment{
         return true;
     }
 
-    private SearchView.OnQueryTextListener onQuerySearchView = new SearchView.OnQueryTextListener() {
-        @Override
-        public boolean onQueryTextSubmit(String s) {
-            return false;
-        }
-
-        @Override
-        public boolean onQueryTextChange(String s) {
-            if (mSearchCheck){
-                // implement your search here
-            }
-            return false;
-        }
-    };
 }
